@@ -1,0 +1,32 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(nvidia-smi)",
+      "Bash(chmod +x /home/yxhou/medium-project/scripts/*.sh)",
+      "Bash(unzip -l LOC_sample_submission.csv.zip)",
+      "Bash(unzip -o LOC_sample_submission.csv.zip)",
+      "Bash(ls -la ~/.kaggle/)",
+      "Read(//home/yxhou/**)",
+      "Bash(pip install *)",
+      "Bash(python -m venv venv)",
+      "Bash(python3 -m venv venv)",
+      "Bash(pipx install *)",
+      "Bash(mkdir -p ~/.kaggle)",
+      "Bash(chmod 600 ~/.kaggle/kaggle.json)",
+      "Bash(~/.local/bin/kaggle competitions *)",
+      "Bash(chmod 600 ~/.kaggle/access_token)",
+      "Bash(python3 download_training_data.py)",
+      "Bash(bash scripts/train_quick.sh)",
+      "Bash(./venv/bin/pip list *)",
+      "Bash(export TORCH_HOME=/home/yxhou/.cache/torch)",
+      "Bash(bash scripts/test_quick.sh)",
+      "Bash(git init *)",
+      "Bash(git remote *)",
+      "Bash(git config *)",
+      "Bash(git add *)"
+    ],
+    "additionalDirectories": [
+      "/home/yxhou"
+    ]
+  }
+}

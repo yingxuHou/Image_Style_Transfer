@@ -1,0 +1,2 @@
+input,output,model,device,image_size,delta_time,content_loss,style_loss,tv_loss
+data/test_images/test.jpg,results/comparisons/test_output.png,checkpoints/test_model.pth,cuda,256,0.107420,17980.761719,7733.833984,4.398712

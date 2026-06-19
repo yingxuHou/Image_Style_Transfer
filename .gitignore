@@ -1,0 +1,36 @@
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+*.pth
+*.pt
+*.onnx
+*.log
+
+# Kaggle credentials
+.kaggle/
+
+# Data files (too large for git)
+data/train_images/*
+data/test_images/*
+data/style_images/*
+checkpoints/*
+results/samples/*
+results/comparisons/*
+logs/*
+
+# Keep directory structure
+!data/train_images/.gitkeep
+!data/test_images/.gitkeep
+!data/style_images/.gitkeep
+!checkpoints/.gitkeep
+!results/samples/.gitkeep
+!results/comparisons/.gitkeep
+!logs/.gitkeep
+
+# Downloaded files
+*.zip
+download_imagenet.py
+download_training_data.py
+download_from_web.py
+download_coco.sh
