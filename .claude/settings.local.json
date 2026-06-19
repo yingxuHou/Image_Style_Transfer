@@ -23,7 +23,14 @@
       "Bash(git init *)",
       "Bash(git remote *)",
       "Bash(git config *)",
-      "Bash(git add *)"
+      "Bash(git add *)",
+      "Bash(git commit -m 'Initial commit: Fast Neural Style Transfer project *)",
+      "Bash(git fetch *)",
+      "Bash(git branch *)",
+      "Bash(git push *)",
+      "Bash(chmod +x sync_github.sh)",
+      "Bash(bash sync_github.sh \"Add GitHub sync guide documentation\")",
+      "Bash(git commit -m 'Add GitHub sync guide documentation *)"
     ],
     "additionalDirectories": [
       "/home/yxhou"
