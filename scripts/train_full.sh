@@ -34,7 +34,7 @@ echo "  训练图像: $TRAIN_COUNT 张"
 echo ""
 
 # 开始训练
-python train.py \
+python3 train.py \
     --train-dir data/train_images \
     --style-image data/style_images/style.jpg \
     --output checkpoints/best_model.pth \

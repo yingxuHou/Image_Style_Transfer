@@ -1,8 +1,13 @@
 from collections import namedtuple
+import os
 
 import torch
 from torch import nn
 from torchvision import models
+
+# 强制设置 PyTorch 缓存目录到用户目录，避免权限问题
+os.environ['TORCH_HOME'] = os.path.expanduser('~/.cache/torch')
+os.environ['XDG_CACHE_HOME'] = os.path.expanduser('~/.cache')
 
 
 VggOutputs = namedtuple("VggOutputs", ["relu1_2", "relu2_2", "relu3_3", "relu4_3"])

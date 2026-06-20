@@ -23,12 +23,23 @@ class PerceptualLoss(nn.Module):
         self.tv_weight = tv_weight
         self.mse = nn.MSELoss()
 
+        # 多层 style loss 权重：浅层降权，深层提权（关键修复！）
+        # 避免浅层噪声主导
+        self.style_layer_weights = [0.2, 0.3, 0.5, 1.0]  # relu1_2, relu2_2, relu3_3, relu4_3
+
     def forward(self, generated, content_features, generated_features, style_grams):
+        # Content loss: 只用 relu3_3（保持结构）
         content_loss = self.mse(generated_features.relu3_3, content_features.relu3_3)
+
+        # Style loss: 多层加权（浅层降权避免噪声）
         style_loss = 0.0
-        for generated_feature, target_gram in zip(generated_features, style_grams):
-            style_loss = style_loss + self.mse(gram_matrix(generated_feature), target_gram)
+        for i, (generated_feature, target_gram) in enumerate(zip(generated_features, style_grams)):
+            layer_loss = self.mse(gram_matrix(generated_feature), target_gram)
+            style_loss = style_loss + self.style_layer_weights[i] * layer_loss
+
+        # TV loss: 抑制噪声
         tv_loss = total_variation_loss(generated)
+
         total_loss = (
             self.content_weight * content_loss
             + self.style_weight * style_loss

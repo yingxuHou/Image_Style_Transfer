@@ -29,7 +29,7 @@ for img in $TEST_IMAGES; do
 
     echo "[$i/$TEST_COUNT] 处理: $filename"
 
-    python test.py \
+    python3 test.py \
         --model checkpoints/best_model.pth \
         --input "$img" \
         --output "results/comparisons/${basename}_stylized.png" \

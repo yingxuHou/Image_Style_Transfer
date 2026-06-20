@@ -1,0 +1,4 @@
+style_weight,delta_time,content_loss,style_loss,model_path,output_image
+1e4,0.094790,20129.710938,1478.539185,checkpoints/model_1e4.pth,results/experiments/output_1e4.png
+1e5,0.097476,20547.820312,1568.746094,checkpoints/best_model.pth,results/experiments/output_1e5.png
+1e6,0.091766,19801.894531,1684.371582,checkpoints/model_1e6.pth,results/experiments/output_1e6.png
