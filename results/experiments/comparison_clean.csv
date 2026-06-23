@@ -1,0 +1,4 @@
+input,output,model,device,image_size,delta_time,content_loss,style_loss,tv_loss
+data/test_images/test.jpg,results/experiments/clean_output_sw1e4.png,checkpoints/experiments/clean_sw1e4.pth,cuda,512,0.092443,23242.335938,1434.768799,38.808472
+data/test_images/test.jpg,results/experiments/clean_output_sw1e5.png,checkpoints/experiments/clean_sw1e5.pth,cuda,512,0.094706,24434.267578,1424.376465,39.722736
+data/test_images/test.jpg,results/experiments/clean_output_sw1e6.png,checkpoints/experiments/clean_sw1e6.pth,cuda,512,0.093476,24934.613281,1463.790649,40.366356
