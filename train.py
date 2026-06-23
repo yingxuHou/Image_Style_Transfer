@@ -29,6 +29,12 @@ def parse_args():
     parser.add_argument("--max-steps", type=int, default=None)
     parser.add_argument("--log-file", default="logs/train_loss.csv")
     parser.add_argument("--sample-output", default="results/samples/train_sample.png")
+    parser.add_argument("--num-workers", type=int, default=4)
+    parser.add_argument(
+        "--val-image",
+        default=None,
+        help="若提供,每个 epoch 末在该图上评估总损失,只保留损失最低的 checkpoint(避免保存训练尖峰/回退的模型)",
+    )
     return parser.parse_args()
 
 
@@ -47,7 +53,7 @@ def main():
         train_dataset,
         batch_size=args.batch_size,
         shuffle=True,
-        num_workers=0,
+        num_workers=args.num_workers,
         drop_last=False,
     )
 
@@ -61,12 +67,32 @@ def main():
         style_features = vgg(imagenet_preprocess_batch(style_image))
         style_grams = [gram_matrix(feature) for feature in style_features]
 
+    # 验证图:每 epoch 末用它评估总损失,只保留最优 checkpoint
+    val_image = None
+    if args.val_image:
+        val_image = load_image(args.val_image, args.image_size).to(device)
+
+    def evaluate_val():
+        """在验证图上计算总损失(与训练同口径)。"""
+        transform_net.eval()
+        if device.type == "cuda":
+            torch.cuda.empty_cache()
+        with torch.no_grad():
+            gen = transform_net(val_image)
+            cf = vgg(imagenet_preprocess_batch(val_image))
+            gf = vgg(imagenet_preprocess_batch(gen))
+            total, _, _, _ = criterion(gen, cf, gf, style_grams)
+        transform_net.train()
+        return float(total.cpu())
+
     log_path = Path(args.log_file)
     log_path.parent.mkdir(parents=True, exist_ok=True)
     output_path = Path(args.output)
     output_path.parent.mkdir(parents=True, exist_ok=True)
 
     global_step = 0
+    best_val = float("inf")
+    best_epoch = 0
     start_time = time.perf_counter()
     with log_path.open("w", newline="", encoding="utf-8") as file:
         writer = csv.writer(file)
@@ -104,17 +130,30 @@ def main():
                 if args.max_steps and global_step >= args.max_steps:
                     break
 
-            torch.save(transform_net.state_dict(), output_path)
+            if val_image is not None:
+                val_loss = evaluate_val()
+                progress.write(f"[epoch {epoch}] val_loss={val_loss:,.0f} (best={best_val:,.0f} @ep{best_epoch})")
+                if val_loss < best_val:
+                    best_val = val_loss
+                    best_epoch = epoch
+                    torch.save(transform_net.state_dict(), output_path)
+                    progress.write(f"  -> 新最优,已保存 {output_path}")
+            else:
+                torch.save(transform_net.state_dict(), output_path)
             if args.max_steps and global_step >= args.max_steps:
                 break
 
     elapsed = time.perf_counter() - start_time
-    torch.save(transform_net.state_dict(), output_path)
+    # 无验证图时,保存最后一个 epoch(维持原行为);有验证图时 output_path 已是最优,不再覆盖
+    if val_image is None:
+        torch.save(transform_net.state_dict(), output_path)
     sample_batch = next(iter(train_loader)).to(device)
     with torch.no_grad():
         sample = transform_net(sample_batch[:1])
     save_image(sample, args.sample_output)
     print(f"saved checkpoint: {output_path}")
+    if val_image is not None:
+        print(f"best epoch: {best_epoch}, best val_loss: {best_val:,.0f}")
     print(f"saved sample: {args.sample_output}")
     print(f"saved log: {log_path}")
     print(f"elapsed: {elapsed:.2f}s, steps: {global_step}, device: {device}")

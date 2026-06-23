@@ -1,0 +1,7 @@
+input,output,model,device,image_size,delta_time,content_loss,style_loss,tv_loss
+data/test_images/test.jpg,results/experiments/ratio_250to1_out_test.png,checkpoints/experiments/ratio_250to1.pth,cuda,672,0.096095,13143.263672,1065.041138,36.238525
+data/test_images/test1.JPG,results/experiments/ratio_250to1_out_test1.png,checkpoints/experiments/ratio_250to1.pth,cuda,672,0.087495,13770.589844,1086.334595,36.087181
+data/test_images/test.jpg,results/experiments/ratio_500to1_out_test.png,checkpoints/experiments/ratio_500to1.pth,cuda,672,0.097326,15337.456055,1022.567078,35.934761
+data/test_images/test1.JPG,results/experiments/ratio_500to1_out_test1.png,checkpoints/experiments/ratio_500to1.pth,cuda,672,0.092179,16281.718750,1003.803467,36.276947
+data/test_images/test.jpg,results/experiments/ratio_1000to1_out_test.png,checkpoints/experiments/ratio_1000to1.pth,cuda,672,0.097647,17004.640625,985.585938,36.059784
+data/test_images/test1.JPG,results/experiments/ratio_1000to1_out_test1.png,checkpoints/experiments/ratio_1000to1.pth,cuda,672,0.089047,18231.347656,928.914978,36.997765
