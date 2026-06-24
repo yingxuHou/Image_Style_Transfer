@@ -1,5 +1,5 @@
-#!/bin/bash
-# 成品训练脚本:用已验证的最佳配置训练一个新风格模型
+﻿#!/bin/bash
+# 成品训练脚本:用最终视觉推荐配置训练一个新风格模型
 # 用法:
 #   bash scripts/train_style.sh <风格图路径> <输出名称> [比例]
 # 示例:
@@ -8,15 +8,15 @@
 #
 # 配置来自比例扫描实验(scripts/ratio_sweep.sh)的结论:
 #   16 epoch / 512 / batch16 / tv=1e-4 / lr=1e-3,content_weight=10
-#   默认比例 500:1(style_weight=5000),内容与风格平衡
+#   默认比例 250:1(style_weight=2500),细节保留最佳；500:1 可作为风格更明显的平衡备选
 #   带 best-checkpoint:每 epoch 末在验证图上评估,只保留最优(避开训练尖峰)
 set -e
 cd "$(dirname "$0")/.."
 export PYTORCH_CUDA_ALLOC_CONF=expandable_segments:True
 
-STYLE_IMG="${1:?用法: bash scripts/train_style.sh <风格图路径> <输出名称> [比例,默认500]}"
-NAME="${2:?用法: bash scripts/train_style.sh <风格图路径> <输出名称> [比例,默认500]}"
-RATIO="${3:-500}"                 # content:style 比例,可选 250 / 500 / 1000
+STYLE_IMG="${1:?用法: bash scripts/train_style.sh <风格图路径> <输出名称> [比例,默认250]}"
+NAME="${2:?用法: bash scripts/train_style.sh <风格图路径> <输出名称> [比例,默认250]}"
+RATIO="${3:-250}"                 # content:style 比例,可选 250 / 500 / 1000
 
 CONTENT_W=10
 STYLE_W=$(( CONTENT_W * RATIO ))  # style_weight = content_weight * ratio

@@ -1,0 +1,18 @@
+model_name,model,note,input,output,device,image_size,delta_time,content_loss,style_loss,tv_loss
+test_model,checkpoints/test_model.pth,sanity / 1ep-7steps,data/test_images/test2.png,results/experiments/test2_all_models/test_model.png,cpu,672,1.007778,17761.544922,23434.742188,4.856755
+real_model,checkpoints/real_model.pth,early / 2ep-8steps,data/test_images/test2.png,results/experiments/test2_all_models/real_model.png,cpu,672,1.088051,13676.948242,11561.203125,2.928467
+best_model_early_name,checkpoints/best_model.pth,"early filename, not final best",data/test_images/test2.png,results/experiments/test2_all_models/best_model_early_name.png,cpu,672,1.087504,21848.439453,4273.877930,40.277378
+model_10epochs,checkpoints/model_10epochs.pth,10ep / 256,data/test_images/test2.png,results/experiments/test2_all_models/model_10epochs.png,cpu,672,0.939345,22112.820312,4324.090820,39.486046
+model_15epochs,checkpoints/model_15epochs.pth,15ep / 256,data/test_images/test2.png,results/experiments/test2_all_models/model_15epochs.png,cpu,672,0.999885,22422.902344,4486.932129,39.263302
+model_512_15epochs,checkpoints/model_512_15epochs.pth,15ep / 512,data/test_images/test2.png,results/experiments/test2_all_models/model_512_15epochs.png,cpu,672,0.948927,20759.539062,997.180237,35.688362
+model_512_content2x,checkpoints/model_512_content2x.pth,content x2 / 512,data/test_images/test2.png,results/experiments/test2_all_models/model_512_content2x.png,cpu,672,0.965814,21835.804688,972.336487,36.414711
+model_quick_test,checkpoints/model_quick_test.pth,10:2e4 / 5ep,data/test_images/test2.png,results/experiments/test2_all_models/model_quick_test.png,cpu,672,1.002720,21190.503906,1160.406250,35.988068
+model_balanced_500,checkpoints/model_balanced_500.pth,balanced 500 / 20ep,data/test_images/test2.png,results/experiments/test2_all_models/model_balanced_500.png,cpu,672,0.952569,16761.025391,952.328552,35.835423
+clean_sw1e4,checkpoints/experiments/clean_sw1e4.pth,failed clean sweep 1e4,data/test_images/test2.png,results/experiments/test2_all_models/clean_sw1e4.png,cpu,672,0.940338,22179.947266,4228.420410,39.527405
+clean_sw1e5,checkpoints/experiments/clean_sw1e5.pth,failed clean sweep 1e5,data/test_images/test2.png,results/experiments/test2_all_models/clean_sw1e5.png,cpu,672,0.943060,21973.763672,4142.314941,40.151253
+clean_sw1e6,checkpoints/experiments/clean_sw1e6.pth,failed clean sweep 1e6,data/test_images/test2.png,results/experiments/test2_all_models/clean_sw1e6.png,cpu,672,0.916513,22351.671875,4337.587402,40.518806
+model_1e4,checkpoints/experiments/model_1e4.pth,early style 1e4,data/test_images/test2.png,results/experiments/test2_all_models/model_1e4.png,cpu,672,1.046376,20855.005859,4262.602051,41.026962
+model_1e6,checkpoints/experiments/model_1e6.pth,early style 1e6,data/test_images/test2.png,results/experiments/test2_all_models/model_1e6.png,cpu,672,0.981633,22152.771484,4184.660156,34.116867
+ratio_250to1,checkpoints/experiments/ratio_250to1.pth,formal ratio 250:1,data/test_images/test2.png,results/experiments/test2_all_models/ratio_250to1.png,cpu,672,1.063888,13099.391602,999.661926,36.089577
+ratio_500to1,checkpoints/experiments/ratio_500to1.pth,formal ratio 500:1,data/test_images/test2.png,results/experiments/test2_all_models/ratio_500to1.png,cpu,672,0.953422,15107.230469,991.294922,35.796890
+ratio_1000to1,checkpoints/experiments/ratio_1000to1.pth,formal ratio 1000:1,data/test_images/test2.png,results/experiments/test2_all_models/ratio_1000to1.png,cpu,672,1.127731,17153.437500,982.497253,37.033573

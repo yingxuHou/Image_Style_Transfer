@@ -1,0 +1,4 @@
+model_name,model,note,input,output,device,image_size,delta_time,content_loss,style_loss,tv_loss
+ratio_250to1,checkpoints/experiments/ratio_250to1.pth,formal ratio 250:1,data/test_images/test2.png,results/experiments/test2_all_models/ratio_250to1.png,cpu,672,1.063888,13099.391602,999.661926,36.089577
+ratio_500to1,checkpoints/experiments/ratio_500to1.pth,formal ratio 500:1,data/test_images/test2.png,results/experiments/test2_all_models/ratio_500to1.png,cpu,672,0.953422,15107.230469,991.294922,35.796890
+ratio_1000to1,checkpoints/experiments/ratio_1000to1.pth,formal ratio 1000:1,data/test_images/test2.png,results/experiments/test2_all_models/ratio_1000to1.png,cpu,672,1.127731,17153.437500,982.497253,37.033573

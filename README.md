@@ -1,210 +1,156 @@
-# Fast Neural Style - 图像风格迁移项目
+﻿# Fast Neural Style - 图像风格迁移项目
 
-基于 PyTorch 实现的 Fast Neural Style 图像风格迁移模型训练与评估
+基于 PyTorch 从零实现的 Fast Neural Style Transfer 训练、推理与对比实验项目。项目核心目标是训练一个前馈图像转换网络（TransformNet），在冻结的 VGG16 感知损失约束下学习指定艺术风格，并记录 `content_loss`、`style_loss` 与 `delta_time` 等实验指标。
 
 ## 项目概述
 
-- **实验类型**: 智能计算系统期中实验
-- **技术方案**: PyTorch Fast Neural Style（从零实现）
-- **目标**: 训练风格迁移模型，记录损失值和推理时间
+- **课程实验**：智能计算系统期中项目
+- **方法路线**：Johnson et al. Fast Neural Style，前馈网络 + 感知损失
+- **核心实现**：TransformNet、VGG16 特征提取器、Gram 风格损失、TV 平滑损失
+- **最终配置**：512 分辨率、16 epoch、batch size 16、`content_weight=10`、`style_weight=2500`
+- **最佳比例**：content:style = 250:1（细节保留最佳）；500:1 为风格更明显的平衡备选
+- **推理速度**：约 0.09 s/张（RTX 4090 D，672 长边推理）
 
 ## 快速开始
 
 ### 1. 环境准备
 
 ```bash
-# 检查环境
-python -c "import torch; print(f'PyTorch: {torch.__version__}')"
-python -c "import torch; print(f'CUDA: {torch.cuda.is_available()}')"
-
-# 安装依赖（如果需要）
-pip install torch torchvision pillow tqdm
+pip install -r requirements.txt
+python -c "import torch; print(torch.__version__, torch.cuda.is_available())"
 ```
+
+依赖主要包括：`torch`、`torchvision`、`pillow`、`numpy`、`matplotlib`、`tqdm`、`pandas`。
 
 ### 2. 数据准备
 
-当前数据状态：
-- ✅ 风格图像: `data/style_images/style.jpg` (1张)
-- ⚠️ 训练图像: `data/train_images/` (13张 - **需要扩充到 1000-2000张**)
-- ✅ 测试图像: `data/test_images/` (1张 - 建议增加到 3-5张)
+本实验正式训练使用 Natural Images（Kaggle）数据集，共 6,912 张自然图像。为避免提交包过大，`data/downloads/` 与完整训练集不建议随课程作业提交。
 
-**扩充训练数据**:
-- 下载 ImageNet 子集或 COCO 数据集
-- 解压到 `data/train_images/` 目录
-- 支持格式: jpg, jpeg, png, bmp
+当前目录约定如下：
 
-### 3. 快速测试（验证代码可运行）
+| 路径 | 作用 | 提交建议 |
+|---|---|---|
+| `data/train_images/` | 训练脚本默认读取目录；正式训练前需放入训练图像 | 可保留空目录和 `.gitkeep`，不提交完整数据集 |
+| `data/style_images/style.jpg` | 风格图像 | 若老师要求项目可直接运行，建议提交 |
+| `data/test_images/test.jpg`, `test1.JPG`, `test2.png` | 测试图像 | 若老师要求项目可直接运行，建议提交 |
+| `data/downloads/` | Kaggle 原始下载与解压目录 | 不建议提交，体积大且非核心代码 |
+
+下载并准备训练数据：
 
 ```bash
-# 快速训练测试（10步，2分钟）
-bash scripts/train_quick.sh
+bash scripts/download_training_data.sh
+```
 
-# 快速推理测试
+如果下载脚本中的绝对路径与本机目录不同，可将 Natural Images 解压后的图片复制到：
+
+```text
+data/train_images/
+```
+
+### 3. 快速验证代码
+
+```bash
+bash scripts/train_quick.sh
 bash scripts/test_quick.sh
 ```
 
-### 4. 正式训练
+快速脚本用于验证环境与代码链路，不代表报告中的最终实验配置。
+
+### 4. 复现实验配置
 
 ```bash
-# 完整训练（需要 1000+ 张训练图像，2-4 小时）
-bash scripts/train_full.sh
+bash scripts/ratio_sweep.sh
 ```
 
-### 5. 批量测试
+该脚本会训练 250:1、500:1、1000:1 三组 content:style 比例，并输出日志、权重和对比结果。
+
+训练单个新风格模型：
 
 ```bash
-# 测试所有测试图像
-bash scripts/test_all.sh
+bash scripts/train_style.sh data/style_images/style.jpg my_style 250
 ```
 
-## 项目结构
-
-```
-medium-project/
-├── models/                    # 模型实现
-│   ├── transform_net.py       # TransformNet（图像转换网络）
-│   └── vgg.py                 # VGG16（特征提取网络）
-├── utils/                     # 工具函数
-│   ├── loss.py                # 损失函数（Gram矩阵、TV loss）
-│   ├── image.py               # 图像处理
-│   └── dataset.py             # 数据加载
-├── scripts/                   # 快速启动脚本
-│   ├── train_quick.sh         # 快速训练测试
-│   ├── train_full.sh          # 正式训练
-│   ├── test_quick.sh          # 快速推理测试
-│   └── test_all.sh            # 批量测试
-├── data/                      # 数据目录
-│   ├── style_images/          # 风格图像
-│   ├── train_images/          # 训练图像
-│   └── test_images/           # 测试图像
-├── checkpoints/               # 模型权重
-├── results/                   # 实验结果
-│   ├── samples/               # 训练样例
-│   ├── comparisons/           # 对比图
-│   └── metrics.csv            # 性能指标
-├── logs/                      # 训练日志
-├── study/                     # 学习笔记
-├── doc/                       # 实验文档
-├── train.py                   # 训练脚本
-├── test.py                    # 测试脚本
-└── config.py                  # 配置文件
-```
-
-## 使用说明
-
-### 训练
-
-```bash
-python train.py \
-    --train-dir data/train_images \
-    --style-image data/style_images/style.jpg \
-    --output checkpoints/best_model.pth \
-    --epochs 2 \
-    --batch-size 8 \
-    --image-size 256
-```
-
-**主要参数**:
-- `--train-dir`: 训练图像目录
-- `--style-image`: 风格图像路径
-- `--epochs`: 训练轮数（建议 2-4）
-- `--batch-size`: 批大小（RTX 4090 可用 8-16）
-- `--image-size`: 图像尺寸（256 或 512）
-- `--content-weight`: 内容损失权重（默认 1.0）
-- `--style-weight`: 风格损失权重（默认 1e5）
-- `--tv-weight`: TV 损失权重（默认 1e-6）
-
-### 测试
+### 5. 推理测试
 
 ```bash
 python test.py \
-    --model checkpoints/best_model.pth \
-    --input data/test_images/test.jpg \
-    --output results/output.png \
-    --style-image data/style_images/style.jpg \
-    --image-size 512
+  --model checkpoints/experiments/ratio_250to1.pth \
+  --input data/test_images/test.jpg \
+  --output results/output.png \
+  --style-image data/style_images/style.jpg \
+  --image-size 672
 ```
 
-**输出内容**:
-- 风格化图像
-- `delta_time`: 推理时间
-- `content_loss`: 内容损失
-- `style_loss`: 风格损失
-- `tv_loss`: 总变差损失
+输出会包含风格化图像，并在控制台或 CSV 中记录 `delta_time`、`content_loss`、`style_loss`、`tv_loss`。
 
-## 实验记录
+## 项目结构
 
-### 必须记录的指标
+```text
+Image_Style_Transfer/
+├── models/                    # 模型实现
+│   ├── transform_net.py       # TransformNet 图像转换网络
+│   └── vgg.py                 # VGG16 特征提取网络
+├── utils/                     # 数据、图像与损失函数
+│   ├── dataset.py
+│   ├── image.py
+│   └── loss.py
+├── scripts/                   # 训练、测试、对比实验脚本
+│   ├── ratio_sweep.sh
+│   ├── train_style.sh
+│   ├── train_quick.sh
+│   └── test_quick.sh
+├── results/                   # 报告引用的结果图与 CSV
+│   ├── before_after_comparison.png
+│   ├── epochs_comparison.png
+│   ├── resolution_comparison.png
+│   ├── style_weight_comparison.png
+│   ├── experiments/ratio_250to1_out_test.png
+│   ├── experiments/ratio_500to1_out_test.png
+│   └── experiments/ratio_sweep_comparison.png
+├── data/                      # 运行时数据目录，完整训练集不建议提交
+├── checkpoints/               # 模型权重目录；大文件可用 Git LFS 或按脚本重训
+├── logs/                      # 训练日志目录；精简提交可只交关键 CSV
+├── train.py                   # 训练入口
+├── test.py                    # 推理/评估入口
+├── test_stretch.py            # 拉伸/比例测试入口
+├── config.py                  # 默认配置
+├── requirements.txt
+├── 实验报告.md
+├── 实验报告.pdf
+└── 提交说明.md
+```
 
-实验要求必须记录：
-- ✅ `content_loss` 或 `style_loss`（至少一项）
-- ✅ `delta_time`（推理时间）
+## 实验结果摘要
 
-训练时自动记录到 `logs/train_loss.csv`:
-- `step`, `epoch`, `total_loss`, `content_loss`, `style_loss`, `tv_loss`
+正式比例扫描固定 16 epoch、512 分辨率、batch size 16、`content_weight=10`、`tv_weight=1e-4`，只改变 `style_weight`：
 
-测试时自动记录到 `results/metrics.csv`:
-- `input`, `output`, `delta_time`, `content_loss`, `style_loss`, `tv_loss`
+| content:style | 最优 epoch | 内容保持 | 风格强度 | 结论 |
+|---|---:|---|---|---|
+| 250:1 | 8 | 最好 | 较克制 | 最终推荐，细节处理最好 |
+| 500:1 | 6 | 均衡 | 更明显 | 平衡备选 |
+| 1000:1 | 3 | 较弱 | 最强 | 艺术化更强但细节损失更多 |
 
-## 模型架构
+关键结果图见：
 
-### TransformNet（图像转换网络）
-- **编码器**: 3 层卷积（3→32→64→128）
-- **残差层**: 5 个残差块
-- **解码器**: 2 层上采样（128→64→32→3）
-- **归一化**: Instance Normalization
-- **参数量**: 约 1.7M
+- `results/experiments/ratio_sweep_comparison.png`
+- `results/style_weight_comparison.png`
+- `results/resolution_comparison.png`
+- `results/before_after_comparison.png`
+- `results/experiments/ratio_250to1_out_test.png`（最终推荐，细节最佳）
+- `results/experiments/ratio_500to1_out_test.png`（风格更明显的平衡备选）
+- `results/experiments/ratio_sweep_test2_comparison.png`（新增 test2 三组比例对比）
+- `results/experiments/test2_all_models_comparison.png`（新增 test2 全模型复测对比）
 
-### VGG16（特征提取网络）
-- 预训练权重（ImageNet）
-- 参数冻结（不训练）
-- 提取 4 层特征：relu1_2, relu2_2, relu3_3, relu4_3
-- 用于计算内容损失和风格损失
+## 提交说明
 
-## 文档资源
+建议按 `提交说明.md` 中的精简结构提交：保留代码、脚本、README、实验报告 PDF/Markdown、报告引用的结果图和关键 CSV；不提交 `data/downloads/`、`archive/`、`.claude/` 等过程或工具目录。
 
-- `PROJECT_PLAN.md` - 项目总体计划
-- `实施指南与答疑.md` - 核心问题解答
-- `项目整理报告.md` - 代码整理分析
-- `doc/实验要求.md` - 实验要求详情
-- `doc/算法理论基础.md` - 理论基础
-- `doc/高分方案建议.md` - 高分策略
-- `study/` - 学习笔记
+如果课程平台要求“项目可运行”，请额外确认以下文件存在：
 
-## 常见问题
-
-### Q: 训练需要多久？
-A: 
-- 快速测试（10步）: ~2 分钟
-- 小规模（100张×1epoch）: ~20 分钟
-- 正式训练（2000张×2epoch）: ~2-4 小时（RTX 4090 D）
-
-### Q: 显存不够怎么办？
-A:
-- 减小 `--batch-size`（8→4→2）
-- 减小 `--image-size`（256→128）
-
-### Q: 训练数据从哪来？
-A:
-- ImageNet 子集（推荐）
-- MS-COCO 数据集
-- Kaggle 公开数据集
-- 自己收集自然图像
-
-### Q: 风格效果不好怎么办？
-A:
-- 增大 `--style-weight`（1e5 → 1e6）
-- 训练更多轮次
-- 更换更有特色的风格图像
-
-## 实验要求检查清单
-
-- [ ] ✅ 训练出风格迁移模型
-- [ ] ✅ 记录 content_loss 和 style_loss
-- [ ] ✅ 记录 delta_time（推理时间）
-- [ ] ✅ 生成风格迁移结果图
-- [ ] ⏳ 撰写实验报告（≥3页）
-- [ ] ⏳ 整理代码和模型文件
+- `data/style_images/style.jpg`
+- `data/test_images/test.jpg`
+- `data/test_images/test1.JPG`
+- 训练数据已下载或已复制到 `data/train_images/`
 
 ## 参考文献
 
@@ -214,5 +160,8 @@ A:
 
 ---
 
-**硬件配置**: RTX 4090 D (24GB)  
-**更新时间**: 2026-06-19
+**硬件配置**：RTX 4090 D (24GB)  
+**报告日期**：2026-06-19 ~ 2026-06-23
+
+
+
